@@ -1,0 +1,6 @@
+{
+    "extends": "@vanderlaan/eslint-config-vanderlaan/test",
+    "rules": {
+      "promise/always-return": "off"
+    }
+  }

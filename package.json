@@ -1,0 +1,53 @@
+{
+  "name": "@vanderlaan/nconf-secrets",
+  "version": "1.0.0",
+  "description": "A container secrets store for nconf",
+  "main": "index.js",
+  "scripts": {
+    "test": "JUNIT_REPORT_PATH=./reports/test-report.xml nyc --report-dir=./reports/coverage --reporter=text --reporter=html node_modules/.bin/mocha --reporter mocha-jenkins-reporter --recursive 'test/**/!(*.bench).js'",
+    "lint": "node_modules/.bin/eslint ./; true",
+    "lint:fix": "node_modules/.bin/eslint --fix ./; true",
+    "ci-lint": "mkdir -p ./reports && node_modules/.bin/eslint -f checkstyle ./ > ./reports/checkstyle.xml; true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bvanderlaan/nconf-secrets.git"
+  },
+  "engines": {
+    "node": ">=8.7.0",
+    "npm": "~5.4.2"
+  },
+  "files": [
+    "lib/",
+    "index.js"
+  ],
+  "keywords": [
+    "nconf",
+    "docker",
+    "swarm",
+    "secrets",
+    "docker-compose"
+  ],
+  "author": {
+    "name": "Brad van der Laan",
+    "email": "brad.vanderlaan@gmail.com"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bvanderlaan/nconf-secrets/issues"
+  },
+  "homepage": "https://github.com/bvanderlaan/nconf-secrets#readme",
+  "devDependencies": {
+    "@vanderlaan/eslint-config-vanderlaan": "^1.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "mocha-jenkins-reporter": "^0.4.1",
+    "nconf": "^0.10.0"
+  },
+  "dependencies": {
+    "@cloudreach/docker-secrets": "^1.0.3"
+  },
+  "peerDependencies": {
+    "nconf": "^0.10.0"
+  }
+}
