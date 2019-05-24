@@ -55,12 +55,12 @@ describe('Dockersecrets :: Unit ::', () => {
       expect(plugin).to.have.property('logicalSeparator', '__');
     });
 
-    it('should default to not parsing nested values', () => {
+    it('should default to not parsing well-known values', () => {
       const plugin = new Dockersecrets();
       expect(plugin).to.have.property('parseValues', false);
     });
 
-    it('should allow option to enable parsing of nested values', () => {
+    it('should allow option to enable parsing of well-known values', () => {
       const plugin = new Dockersecrets({ parseValues: true });
       expect(plugin).to.have.property('parseValues', true);
     });
@@ -101,28 +101,6 @@ describe('Dockersecrets :: Unit ::', () => {
         expect(plugin.store).to.deep.equals({
           MY_SECRET: 'hello world',
           MY__NESTED__SECRET: 'hello world',
-          'MY:OTHER:NESTED:SECRET': 'hello world',
-        });
-      });
-    });
-
-    describe('with lower case options', () => {
-      it('should convert to lower case', () => {
-        const plugin = new Dockersecrets({ lowerCase: true });
-        expect(plugin.store).to.deep.equals({
-          my_secret: 'hello world',
-          my__nested__secret: 'hello world',
-          'my:other:nested:secret': 'hello world',
-        });
-      });
-    });
-
-    describe('with parse nested values options', () => {
-      it('should parse out nested values with default separator', () => {
-        const plugin = new Dockersecrets({ parseValues: true });
-        expect(plugin.store).to.deep.equals({
-          MY_SECRET: 'hello world',
-          MY__NESTED__SECRET: 'hello world',
           MY: {
             OTHER: {
               NESTED: {
@@ -134,9 +112,26 @@ describe('Dockersecrets :: Unit ::', () => {
       });
     });
 
+    describe('with lower case options', () => {
+      it('should convert to lower case', () => {
+        const plugin = new Dockersecrets({ lowerCase: true });
+        expect(plugin.store).to.deep.equals({
+          my_secret: 'hello world',
+          my__nested__secret: 'hello world',
+          my: {
+            other: {
+              nested: {
+                secret: 'hello world',
+              },
+            },
+          },
+        });
+      });
+    });
+
     describe('with custom separator options', () => {
       it('should parse out nested values with custom separator', () => {
-        const plugin = new Dockersecrets({ parseValues: true, logicalSeparator: '__' });
+        const plugin = new Dockersecrets({ logicalSeparator: '__' });
         expect(plugin.store).to.deep.equals({
           MY_SECRET: 'hello world',
           MY: {
@@ -181,16 +176,28 @@ describe('Dockersecrets :: Unit ::', () => {
         plugin.load((err, store) => {
           if (err) done(err);
 
-          expect(store).to.deep.equals({
+          expect(store, 'return value').to.deep.equals({
             my_secret: 'hello world',
             my__nested__secret: 'hello world',
-            'my:other:nested:secret': 'hello world',
+            my: {
+              other: {
+                nested: {
+                  secret: 'hello world',
+                },
+              },
+            },
           });
 
-          expect(plugin.store).to.deep.equals({
+          expect(plugin.store, 'store').to.deep.equals({
             my_secret: 'hello world',
             my__nested__secret: 'hello world',
-            'my:other:nested:secret': 'hello world',
+            my: {
+              other: {
+                nested: {
+                  secret: 'hello world',
+                },
+              },
+            },
           });
 
           done();
@@ -230,7 +237,6 @@ describe('Dockersecrets :: Unit ::', () => {
 
       plugin = new Dockersecrets({
         lowerCase: true,
-        parseValues: true,
         logicalSeparator: '__',
       });
     });
