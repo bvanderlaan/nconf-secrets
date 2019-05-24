@@ -13,7 +13,7 @@ require('@vanderlaan/nconf-secrets');
 
 nconf.argv()
   .env('__')
-  .use('dockersecrets', { lowerCase: true, separator: '__' });
+  .use('dockersecrets', { lowerCase: true, parseValues: true, separator: '__' });
 
 console.log(nconf.get('http__shared_secret'));
 ```
@@ -34,6 +34,7 @@ nconf.argv()
   .env('__')
   .use('dockersecrets', {
     lowerCase: true,
+    parseValues: true,
     separator: '__',
     secretsDir: '/my/secrets/path',
   });
@@ -49,6 +50,7 @@ After requiring `nconf-secrets` its storage will automagically be registered to 
 |Parameter|Description|
 |:--------|:----------|
 |lowerCase|Converts the secret keys to lower case. Default `false`|
+|parseValues|Attempt to parse well-known values (e.g. 'false', 'true', 'null', 'undefined', '3', '5.1', and JSON values) into their proper types. If a value cannot be parsed, it will remain a string. Default `false`|
 |separator|Defines what the character nconf-secrets should use to denote a nested value. Default `undefined` (disabled)|
 |secretsDir|The path to the secrets directory. Default to Docker Swarm default location|
 

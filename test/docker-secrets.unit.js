@@ -156,6 +156,53 @@ describe('Dockersecrets :: Unit ::', () => {
     });
   });
 
+  describe('Load from Constructor', () => {
+    before('stub load-docker-secrets', () => {
+      sinon.stub(fs, 'existsSync').returns(true);
+      sinon.stub(fs, 'readdirSync').returns([
+        'MY_TRUE',
+        'MY_FALSE',
+        'MY_NUMBER',
+        'MY_SECRET',
+        'MY__NESTED__SECRET',
+        'MY__MIXED_SECRET',
+        'MY:OTHER:NESTED:SECRET',
+        'MY_BAD_VALUE',
+      ]);
+
+      const readFileSync = sinon.stub(fs, 'readFileSync');
+      readFileSync.withArgs('/run/secrets/MY_SECRET', 'utf8').returns('undefined');
+      readFileSync.withArgs('/run/secrets/MY__NESTED__SECRET', 'utf8').returns('null');
+      readFileSync.withArgs('/run/secrets/MY_TRUE', 'utf8').returns('true');
+      readFileSync.withArgs('/run/secrets/MY_FALSE', 'utf8').returns('false');
+      readFileSync.withArgs('/run/secrets/MY_NUMBER', 'utf8').returns('42');
+      readFileSync.withArgs('/run/secrets/MY__MIXED_SECRET', 'utf8').returns('5.1');
+      readFileSync.withArgs('/run/secrets/MY:OTHER:NESTED:SECRET', 'utf8').returns('{"hello":"world"}');
+      readFileSync.withArgs('/run/secrets/MY_BAD_VALUE', 'utf8').returns('{"hello"');
+    });
+    after(() => {
+      fs.existsSync.restore();
+      fs.readdirSync.restore();
+      fs.readFileSync.restore();
+    });
+
+    describe('with parseValues option', () => {
+      it('should parse well known types', () => {
+        const plugin = new Dockersecrets({ parseValues: true });
+        expect(plugin.store).to.deep.equals({
+          MY_SECRET: undefined,
+          MY_TRUE: true,
+          MY_FALSE: false,
+          MY_NUMBER: 42,
+          MY__MIXED_SECRET: 5.1,
+          MY__NESTED__SECRET: null,
+          'MY:OTHER:NESTED:SECRET': { hello: 'world' },
+          MY_BAD_VALUE: '{"hello"',
+        });
+      });
+    });
+  });
+
   describe('Load', () => {
     let plugin;
     before('stub load-docker-secrets', () => {
