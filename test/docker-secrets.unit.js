@@ -3,13 +3,13 @@
 const fs = require('fs');
 
 const chai = require('chai');
-// const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
 
 const { Dockersecrets } = require('../lib/docker-secrets');
 
 const { expect } = chai;
-// chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 describe('Dockersecrets :: Unit ::', () => {
   describe('Properties', () => {
@@ -81,7 +81,7 @@ describe('Dockersecrets :: Unit ::', () => {
   });
 
   describe('Load from Constructor', () => {
-    before('stub load-docker-secrets', () => {
+    beforeEach('stub load-docker-secrets', () => {
       sinon.stub(fs, 'existsSync').returns(true);
       sinon.stub(fs, 'readdirSync').returns([
         'MY_SECRET',
@@ -91,7 +91,7 @@ describe('Dockersecrets :: Unit ::', () => {
       ]);
       sinon.stub(fs, 'readFileSync').returns('hello world');
     });
-    after(() => {
+    afterEach(() => {
       fs.existsSync.restore();
       fs.readdirSync.restore();
       fs.readFileSync.restore();
@@ -152,6 +152,24 @@ describe('Dockersecrets :: Unit ::', () => {
             },
           },
         });
+      });
+    });
+
+    describe('with default path', () => {
+      it('should use default secrets path', () => {
+        // eslint-disable-next-line no-unused-vars
+        const plugin = new Dockersecrets();
+        expect(fs.readdirSync).to.have.been.calledOnce;
+        expect(fs.readdirSync).to.have.been.calledWith('/run/secrets');
+      });
+    });
+
+    describe('with custom secrets path options', () => {
+      it('should read files from custom path', () => {
+        // eslint-disable-next-line no-unused-vars
+        const plugin = new Dockersecrets({ secretsDir: '/my/path' });
+        expect(fs.readdirSync).to.have.been.calledOnce;
+        expect(fs.readdirSync).to.have.been.calledWith('/my/path');
       });
     });
   });
