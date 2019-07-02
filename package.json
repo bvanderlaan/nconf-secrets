@@ -1,6 +1,6 @@
 {
   "name": "@vanderlaan/nconf-secrets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A container secrets store for nconf",
   "main": "index.js",
   "scripts": {
